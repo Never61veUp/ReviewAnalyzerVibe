@@ -1,5 +1,8 @@
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.EntityFrameworkCore;
 using ReviewAnalyzer.Application.Services;
+using ReviewAnalyzer.PostgreSql;
+using ReviewAnalyzer.PostgreSql.Repositories;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,6 +11,8 @@ var services = builder.Services;
 
 services.AddScoped<IProcessReview, ProcessReviewMoq>();
 services.AddScoped<IGroupReviewService, GroupReviewService>();
+services.AddScoped<IGroupRepository, GroupRepository>();
+services.AddScoped<IReviewRepository, ReviewRepository>();
 
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
@@ -31,6 +36,13 @@ builder.Services.Configure<FormOptions>(options =>
 builder.WebHost.ConfigureKestrel(options =>
 {
     options.Limits.MaxRequestBodySize = 200 * 1024 * 1024; // 200 MB
+});
+
+var connectionString = builder.Configuration.GetConnectionString("Postgres");
+
+services.AddDbContext<ReviewDbContext>(options =>
+{
+    options.UseNpgsql(connectionString);
 });
 
 var app = builder.Build();

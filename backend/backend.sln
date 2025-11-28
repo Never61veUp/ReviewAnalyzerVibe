@@ -16,6 +16,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastru
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReviewAnalyzer.PostgreSql", "ReviewAnalyzer.PostgreSql\ReviewAnalyzer.PostgreSql.csproj", "{AED04CEA-9C8F-43BC-B66C-209712998390}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReviewAnalyzer.PostgreSql.MigrationService", "ReviewAnalyzer.PostgreSql.MigrationService\ReviewAnalyzer.PostgreSql.MigrationService.csproj", "{6ACDD844-2FD4-41B9-8E06-73537F3E8D3B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -38,8 +40,13 @@ Global
 		{AED04CEA-9C8F-43BC-B66C-209712998390}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AED04CEA-9C8F-43BC-B66C-209712998390}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AED04CEA-9C8F-43BC-B66C-209712998390}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6ACDD844-2FD4-41B9-8E06-73537F3E8D3B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6ACDD844-2FD4-41B9-8E06-73537F3E8D3B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6ACDD844-2FD4-41B9-8E06-73537F3E8D3B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6ACDD844-2FD4-41B9-8E06-73537F3E8D3B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{AED04CEA-9C8F-43BC-B66C-209712998390} = {B80E2779-9333-4ABB-B51A-F167E802DD0D}
+		{6ACDD844-2FD4-41B9-8E06-73537F3E8D3B} = {B80E2779-9333-4ABB-B51A-F167E802DD0D}
 	EndGlobalSection
 EndGlobal

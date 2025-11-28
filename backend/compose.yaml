@@ -10,6 +10,8 @@
       - "8080:8080"
     depends_on:
       - postgres
+    environment:
+      ConnectionStrings__Postgres: "Host=postgres;Port=5432;Database=reviewdb;Username=supersecretuser;Password=S0m3$tr0ngP@ssw0rd!"
 
   postgres:
     image: postgres:16
@@ -21,4 +23,14 @@
       POSTGRES_DB: "reviewdb"
     ports:
       - "5432:5432"
+
+  reviewanalyzer.postgresql.migrationservice:
+    image: reviewanalyzer.postgresql.migrationservice
+    build:
+      context: .
+      dockerfile: ReviewAnalyzer.PostgreSql.MigrationService/Dockerfile
+    environment:
+      ConnectionStrings__Postgres: "Host=postgres;Port=5432;Database=reviewdb;Username=supersecretuser;Password=S0m3$tr0ngP@ssw0rd!"
+    depends_on:
+      - postgres
 
