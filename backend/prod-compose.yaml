@@ -13,7 +13,7 @@ services:
     environment:
       ConnectionStrings__Postgres: "Host=postgres;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}"
     networks:
-      - ${DOCKER_NETWORK}
+      - osccowgkgkkkwwkgcg448ggc
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.reviewanalyzer.rule=Host(`api.reviewanalyzer.mixdev.me`)"
@@ -32,7 +32,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
-      - ${DOCKER_NETWORK}
+      - osccowgkgkkkwwkgcg448ggc
   postgres-migrations:
     build:
       context: .
@@ -44,7 +44,7 @@ services:
       ConnectionStrings__Postgres: "Host=postgres;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};
       Password=${POSTGRES_PASSWORD}"
     networks:
-      - ${DOCKER_NETWORK}
+      - osccowgkgkkkwwkgcg448ggc
     restart: no
 #  ml-model:
 #    image: ml-model
