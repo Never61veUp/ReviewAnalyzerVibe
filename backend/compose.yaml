@@ -8,6 +8,17 @@
     restart: unless-stopped
     ports:
       - "8080:8080"
+    depends_on:
+      - postgres
 
-
+  postgres:
+    image: postgres:16
+    container_name: reviewanalyzer-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: "supersecretuser"
+      POSTGRES_PASSWORD: "S0m3$tr0ngP@ssw0rd!"
+      POSTGRES_DB: "reviewdb"
+    ports:
+      - "5432:5432"
 
