@@ -33,10 +33,10 @@ public class GroupController : BaseController
         }
 
         // вызываем твой сервис (реальный или мок)
-        var result = _groupReviewService.AddGroupReview(csvBytes, file.FileName, cancellationToken);
-
+        var result = await _groupReviewService.AddGroupReview(csvBytes, file.FileName, cancellationToken);
         
-        return FromResult(Result.Success());
+        
+        return FromResult(result);
     }
 
     [HttpGet]
