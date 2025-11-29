@@ -48,9 +48,10 @@ services.AddDbContext<ReviewDbContext>(options =>
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+app.MapOpenApi();
+
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
     app.MapScalarApiReference(options =>
     {
         options.Title = "API Documentation";
@@ -61,6 +62,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors();
+app.UseHsts();
 
 app.UseHttpsRedirection();
 
