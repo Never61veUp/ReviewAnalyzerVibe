@@ -47,6 +47,13 @@ services:
     networks:
       - osccowgkgkkkwwkgcg448ggc
     restart: no
+    
+  frontend:
+    build:
+      context: ..
+      dockerfile: /frontend/Dockerfile
+    ports:
+      - "5173:5173"
 #  ml-model:
 #    image: ml-model
 #    build:
