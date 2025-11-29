@@ -31,8 +31,6 @@ public class GroupRepository : IGroupRepository
         var reviews = groupEntity.Reviews.ToList();
         groupEntity.Reviews.Clear();
 
-        await using var transaction = await _context.Database.BeginTransactionAsync(cancellationToken);
-
         await _context.ReviewGroups.AddAsync(groupEntity, cancellationToken);
         await _context.SaveChangesAsync(cancellationToken);
 
@@ -42,7 +40,6 @@ public class GroupRepository : IGroupRepository
             await _context.SaveChangesAsync(cancellationToken);
         }
 
-        await transaction.CommitAsync(cancellationToken);
         return Result.Success();
     }
 }
