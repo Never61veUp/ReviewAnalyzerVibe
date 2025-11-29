@@ -57,13 +57,16 @@ public class GroupReviewService : IGroupReviewService
         return Result.Success<Guid>(groupEntity.Id);
     }
 
-    public async Task<Result<IEnumerable<ReviewGroupEntity>>> GetAllGroups(CancellationToken cancellationToken)
+    public async Task<Result<IEnumerable<ReviewGroup>>> GetAllGroups(CancellationToken cancellationToken)
     {
         var result = await _groupRepository.GetAllGroupsWithoutReviews();
         if(result.IsFailure)
-            return Result.Failure<IEnumerable<ReviewGroupEntity>>(result.Error);
+            return Result.Failure<IEnumerable<ReviewGroup>>(result.Error);
+
+        var groups = result.Value.Select(g =>
+            ReviewGroup.Create(g.Name, [], g.Date, 1, g.ReviewCount, g.Id).Value);
         
-        return Result.Success(result.Value);
+        return Result.Success(groups);
     }
     
     public List<ReviewInput> ParseCsv(byte[] bytes)

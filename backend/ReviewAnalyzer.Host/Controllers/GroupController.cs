@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using ReviewAnalyzer.Application.Services;
+using ReviewAnalyzer.Host.Contracts;
 
 namespace ReviewAnalyzer.Host.Controllers;
 
@@ -34,14 +35,17 @@ public class GroupController : BaseController
         
         var result = await _groupReviewService.AddGroupReview(csvBytes, file.FileName, cancellationToken);
         
-        
         return FromResult(result);
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetGroupsWithoutReviews(CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<GroupResponse>>> GetGroupsWithoutReviews(CancellationToken cancellationToken)
     {
         var result = await _groupReviewService.GetAllGroups(cancellationToken);
-        return FromResult(result);
+        if (result.IsFailure)
+            return BadRequest(result.Error);
+
+        var groupResponses = result.Value.Select(GroupResponse.FromDomain).ToList();
+        return groupResponses;
     }
 }

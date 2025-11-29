@@ -6,6 +6,7 @@ public class ReviewGroupEntity
 
     public string? Name { get; set; }
     public DateTime Date { get; set; }
+    public int ReviewCount { get; set; }
     
     public required List<ReviewEntity> Reviews { get; set; }
 }
