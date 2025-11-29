@@ -50,16 +50,13 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 app.MapOpenApi();
 
-if (app.Environment.IsDevelopment())
+app.MapScalarApiReference(options =>
 {
-    app.MapScalarApiReference(options =>
-    {
-        options.Title = "API Documentation";
-        options.Theme = ScalarTheme.Default;
-        if(!app.Environment.IsDevelopment())
-            options.AddServer("https://api.reviewanalyzer.mixdev.me");
-    });
-}
+    options.Title = "API Documentation";
+    options.Theme = ScalarTheme.Default;
+    if(!app.Environment.IsDevelopment())
+        options.AddServer("https://api.reviewanalyzer.mixdev.me");
+});
 
 app.UseCors();
 app.UseHsts();
