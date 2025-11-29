@@ -1,11 +1,25 @@
 import React, { useState } from "react";
 import { FaSmile, FaFrown, FaMeh } from "react-icons/fa";
-import { uploadText, Group, Review } from "../api/groups";
+
+interface Review {
+  id: string;
+  text: string;
+  label: "positive" | "neutral" | "negative";
+  confidence: number;
+}
+
+interface Group {
+  id: string;
+  name: string;
+  date: string;
+  generalScore: number;
+  reviews: Review[];
+}
 
 interface Props {
   textInput: string;
   setTextInput: React.Dispatch<React.SetStateAction<string>>;
-  onAnalyze: () => void;
+  onAnalyze?: () => void;
 }
 
 export default function SingleAnalysis({ textInput, setTextInput }: Props) {
@@ -15,6 +29,31 @@ export default function SingleAnalysis({ textInput, setTextInput }: Props) {
     "Нейтральный"
   );
   const [group, setGroup] = useState<Group | null>(null);
+
+  const mockAnalyze = (text: string) => {
+    const wordsCount = text.trim().split(/\s+/).length;
+    const charsCount = text.trim().length;
+
+    // Мок: процент положительных отзывов = 50 + (кол-во символов % 50)
+    const percentagePositiveReview = Math.min(100, 50 + (charsCount % 50));
+
+    // Мок: создаём фейковые отзывы
+    const reviews: Review[] = [
+      { id: "1", text: `Текст длиной ${charsCount} символов`, label: "positive", confidence: percentagePositiveReview / 100 },
+      { id: "2", text: `Количество слов: ${wordsCount}`, label: "neutral", confidence: 0.6 },
+      { id: "3", text: "Пример негативного отзыва", label: "negative", confidence: 0.4 },
+    ];
+
+    const group: Group = {
+      id: "g1",
+      name: "Фейковая группа",
+      date: new Date().toISOString(),
+      generalScore: reviews.reduce((sum, r) => sum + r.confidence, 0) / reviews.length,
+      reviews,
+    };
+
+    return { percentagePositiveReview, groups: [group] };
+  };
 
   const handleAnalyze = async () => {
     if (!textInput.trim()) return;
@@ -27,17 +66,18 @@ export default function SingleAnalysis({ textInput, setTextInput }: Props) {
     }, 30);
 
     try {
-      const result = await uploadText(textInput);
+      // Мокаем анализ текста
+      const result = mockAnalyze(textInput);
       clearInterval(interval);
 
-      const percent = result.result.percentagePositiveReview;
+      const percent = result.percentagePositiveReview;
       setDisplaySatisfaction(percent);
 
       if (percent > 60) setSentiment("Позитивный");
       else if (percent < 40) setSentiment("Негативный");
       else setSentiment("Нейтральный");
 
-      setGroup(result.result.groups[result.result.groups.length - 1] || null);
+      setGroup(result.groups[result.groups.length - 1] || null);
     } catch (err) {
       console.error(err);
       clearInterval(interval);
@@ -121,7 +161,7 @@ export default function SingleAnalysis({ textInput, setTextInput }: Props) {
             <p className="text-sm" style={{ color: "var(--text)" }}>Дата: {new Date(group.date).toLocaleString()}</p>
             <p className="text-sm" style={{ color: "var(--text)" }}>Общий скор отзывов: {Math.round(group.generalScore * 100)}%</p>
             <p className="text-sm mt-2 font-semibold" style={{ color: "var(--text)" }}>Отзывы:</p>
-            {group.reviews.map((r: Review) => (
+            {group.reviews.map((r) => (
               <div key={r.id} className="text-sm mt-1">
                 <span className="font-medium">{r.label.toUpperCase()}:</span> {r.text} (Уверенность: {Math.round(r.confidence * 100)}%)
               </div>

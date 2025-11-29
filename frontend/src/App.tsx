@@ -5,7 +5,6 @@ import { useTheme } from "./hooks/useTheme";
 import Header from "./components/layout/Header";
 import Footer from "./components/layout/Footer";
 import Home from "./pages/Home/Home";
-import Feedback from "./pages/Feedback/Feedback";
 import HowItWorks from "./pages/HowItWorks/HowItWorks";
 import AnalysisResultPage from "./pages/AnalysisResultPage";
 
@@ -22,7 +21,6 @@ function App() {
         <main className="flex-1">
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/feedback" element={<Feedback />} />
             <Route path="/how-it-works" element={<HowItWorks />} />
             <Route path="/analysis-result" element={<AnalysisResultPage />} />
           </Routes>

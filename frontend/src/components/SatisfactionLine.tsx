@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { FaSmile, FaFrown, FaMeh } from "react-icons/fa";
 import { motion } from "framer-motion";
-import { uploadText , GroupResponse } from "../api/groups";
+import { uploadFile } from "../api/client";
+import { FileUploadResponse } from "../api/api";
 
 interface Props {
   file: File | null;
@@ -23,11 +24,16 @@ export default function SatisfactionLine({ file }: Props) {
       }, 100);
 
       try {
-        const text = await file.text(); 
-        const result: GroupResponse = await uploadText (text);
+        // Отправка файла на сервер
+        const result: FileUploadResponse | {} = await uploadFile(file);
         clearInterval(interval);
 
-        const percent = result.result.percentagePositiveReview;
+        if (!("id" in result)) throw new Error("Неверный ответ сервера");
+
+        // Берем процент положительных отзывов с сервера
+        // Если сервер не возвращает напрямую, можно потом сделать fetchGroupReviews(result.id)
+        const percent = (result as any).percentagePositiveReview ?? 0;
+
         setSatisfaction(percent);
       } catch (err) {
         console.error(err);
@@ -42,7 +48,11 @@ export default function SatisfactionLine({ file }: Props) {
   }, [file]);
 
   const sentiment =
-    satisfaction > 60 ? "Позитивный" : satisfaction < 40 ? "Негативный" : "Нейтральный";
+    satisfaction > 60
+      ? "Позитивный"
+      : satisfaction < 40
+      ? "Негативный"
+      : "Нейтральный";
 
   const gradient =
     sentiment === "Позитивный"
@@ -62,10 +72,7 @@ export default function SatisfactionLine({ file }: Props) {
 
   return (
     <div className="w-full h-full p-4 flex flex-col">
-      <h3
-        className="text-lg font-semibold mb-3 tracking-wide"
-        style={{ color: "var(--primary)" }}
-      >
+      <h3 className="text-lg font-semibold mb-3 tracking-wide" style={{ color: "var(--primary)" }}>
         Удовлетворенность граждан
       </h3>
 
@@ -103,14 +110,14 @@ export default function SatisfactionLine({ file }: Props) {
         </motion.div>
       </div>
 
-      {/* Цифры с процентами */}
+      {/* Цифры */}
       <div className="w-full flex justify-between px-1 mt-2 text-[10px] text-[var(--text)]/60 select-none">
         {[0, 20, 40, 60, 80, 100].map((val) => (
           <span key={val}>{val}%</span>
         ))}
       </div>
 
-      {/* Текущий процент */}
+      {/* Текущее значение */}
       <p className="mt-3 font-medium text-[var(--text)] text-sm">
         {isAnalyzing ? "Анализируется..." : `Текущее значение: ${satisfaction}%`}
       </p>

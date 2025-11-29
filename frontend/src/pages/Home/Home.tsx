@@ -5,8 +5,6 @@ import HeroSection from "../../components/HeroSection";
 import ModeToggle from "../../components/ModeToggle";
 import SingleAnalysis from "../../components/SingleAnalysis";
 import BatchAnalysis from "../../components/BatchAnalysis";
-import { uploadText } from "../../api/groups";
-import { Review, GroupResponse } from "../../api/client";
 import { FaSmile, FaClock, FaCheckCircle } from "react-icons/fa";
 
 export default function Home() {
@@ -16,39 +14,40 @@ export default function Home() {
 
   const navigate = useNavigate();
 
-  const handleTextAnalyze = async () => {
+  // --- Мок функции анализа текста ---
+  const handleTextAnalyze = () => {
     if (!textInput.trim()) return;
 
-    try {
-      const result: Review | Review[] = await uploadText(textInput);
-      const reviewsArray: Review[] = Array.isArray(result) ? result : [result];
+    // Мокаем результат
+    const charsCount = textInput.length;
+    const wordsCount = textInput.trim().split(/\s+/).length;
+    const percentagePositiveReview = Math.min(100, 50 + (charsCount % 50));
 
-      const positiveCount = reviewsArray.filter(r => r.label === "positive").length;
+    const groupResponse = {
+      result: {
+        groups: [
+          {
+            id: crypto.randomUUID(),
+            name: "Одиночный анализ",
+            date: new Date().toISOString(),
+            generalScore: percentagePositiveReview / 100,
+            reviews: [
+              { id: "1", text: `Текст длиной ${charsCount} символов`, label: "positive", confidence: percentagePositiveReview / 100 },
+              { id: "2", text: `Количество слов: ${wordsCount}`, label: "neutral", confidence: 0.6 },
+              { id: "3", text: "Пример негативного отзыва", label: "negative", confidence: 0.4 },
+            ],
+          },
+        ],
+        percentagePositiveReview,
+      },
+      errorMessage: null,
+      timeGenerated: new Date().toISOString(),
+    };
 
-      const groupResponse: GroupResponse = {
-        result: {
-          groups: [
-            {
-              id: crypto.randomUUID(),
-              name: "Одиночный анализ",
-              date: new Date().toISOString(),
-              generalScore: reviewsArray.reduce((sum, r) => sum + r.confidence, 0) / reviewsArray.length,
-              reviews: reviewsArray,
-            },
-          ],
-          percentagePositiveReview: Math.round((positiveCount / reviewsArray.length) * 100),
-        },
-        errorMessage: null,
-        timeGenerated: new Date().toISOString(),
-      };
-
-      navigate("/analysis-result", { state: { data: groupResponse } });
-    } catch (err) {
-      console.error("Ошибка анализа текста:", err);
-    }
+    navigate("/analysis-result", { state: { data: groupResponse } });
   };
 
-  // Данные карточек
+  // --- Данные карточек ---
   const stats = [
     { label: "Проанализировано отзывов", value: 24567, extra: "+12% за месяц", icon: <FaCheckCircle size={24} /> },
     { label: "Точность модели", value: 94.3, extra: "На тестовой выборке", icon: <FaCheckCircle size={24} /> },

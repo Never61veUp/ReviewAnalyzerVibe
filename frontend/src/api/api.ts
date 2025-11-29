@@ -3,17 +3,23 @@ export interface Review {
   text: string;
   label: "positive" | "neutral" | "negative";
   confidence: number;
+  src?: string;
 }
 
 export interface Group {
   id: string;
   name: string;
   date: string;
-  reviews: Review[];
-  generalScore: number; 
+  reviews?: Review[] | null;
+  generalScore?: number;
+  reviewCount?: number;
 }
 
-export type GroupsResponse = Group[];
+export interface GroupsResponse {
+  result: Group[];
+  errorMessage: string | null;
+  timeGenerated: string;
+}
 
 export interface ReviewRequest {
   review: string;
@@ -28,7 +34,7 @@ export interface ReviewResponse {
 }
 
 export interface FileUploadResponse {
-  id: string;
-  name: string;
-  date: string;
+  result: "Success" | "Error";
+  errorMessage: string | null;
+  timeGenerated: string;
 }
