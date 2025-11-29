@@ -46,4 +46,25 @@ public class ReviewRepository : IReviewRepository
         
         return Result.Success();
     }
+
+    public async Task<Result<IEnumerable<ReviewEntity>>> GetReviewsByTitle(
+        string title,
+        int count,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var reviews = await _context.Reviews
+                .Where(r => r.Text.ToLower().Contains(title.ToLower()))
+                .OrderBy(r => r.Id)
+                .Take(count)
+                .ToListAsync(cancellationToken);
+
+            return reviews;
+        }
+        catch (Exception ex)
+        {
+            return Result.Failure<IEnumerable<ReviewEntity>>(ex.Message);
+        }
+    }
 }

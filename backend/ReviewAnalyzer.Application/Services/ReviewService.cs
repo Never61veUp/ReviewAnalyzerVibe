@@ -33,4 +33,25 @@ public class ReviewService : IReviewService
         
         return Result.Success<IEnumerable<Review>>(reviews);
     }
+
+    public async Task<Result<IEnumerable<Review>>> FilterTitle(string title, int count, CancellationToken cancellationToken)
+    {
+        var reviewsResult = await _repository.GetReviewsByTitle(title, count, cancellationToken);
+        if(reviewsResult.IsFailure)
+            return Result.Failure<IEnumerable<Review>>(reviewsResult.Error);
+        
+        var reviews = reviewsResult.Value
+            .Select(r => Review.Create(
+                r.Text,
+                r.Labels,
+                r.Src,
+                r.Confidence,
+                r.Id
+            ))
+            .Where(result => result.IsSuccess)
+            .Select(result => result.Value)
+            .ToList();
+        
+        return Result.Success<IEnumerable<Review>>(reviews);
+    }
 }
