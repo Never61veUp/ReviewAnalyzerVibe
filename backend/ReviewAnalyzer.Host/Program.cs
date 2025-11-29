@@ -60,9 +60,6 @@ app.MapScalarApiReference(options =>
 });
 
 app.UseCors();
-app.UseHsts();
-
-app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
