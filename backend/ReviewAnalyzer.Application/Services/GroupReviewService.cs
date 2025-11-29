@@ -41,6 +41,7 @@ public class GroupReviewService : IGroupReviewService
             GroupId = groupEntity.Id,
             Index = r.ID,
             Src = r.src,
+            Group = groupEntity
         });
         groupEntity.Reviews.AddRange(listReview);
         

@@ -4,6 +4,14 @@ WORKDIR /app
 EXPOSE 8080
 EXPOSE 8081
 
+USER root
+RUN apt-get update && \
+    apt-get install -y libkrb5-3 && \
+    rm -rf /var/lib/apt/lists/*
+
+ARG APP_UID=1000
+USER ${APP_UID}
+
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src

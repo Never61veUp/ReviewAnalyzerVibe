@@ -16,21 +16,10 @@
   postgres:
     image: postgres:16
     container_name: reviewanalyzer-postgres
-    restart: unless-stopped
     environment:
       POSTGRES_USER: "supersecretuser"
       POSTGRES_PASSWORD: "S0m3$tr0ngP@ssw0rd!"
       POSTGRES_DB: "reviewdb"
     ports:
       - "5432:5432"
-
-  reviewanalyzer.postgresql.migrationservice:
-    image: reviewanalyzer.postgresql.migrationservice
-    build:
-      context: .
-      dockerfile: ReviewAnalyzer.PostgreSql.MigrationService/Dockerfile
-    environment:
-      ConnectionStrings__Postgres: "Host=postgres;Port=5432;Database=reviewdb;Username=supersecretuser;Password=S0m3$tr0ngP@ssw0rd!"
-    depends_on:
-      - postgres
 

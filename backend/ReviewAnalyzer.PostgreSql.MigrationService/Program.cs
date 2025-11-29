@@ -22,12 +22,12 @@ await migrator.ApplyMigrationsAsync();
 
 public class MigrationService : IMigrationService
 {
-    private readonly IServiceProvider _provider;
+    private readonly ReviewDbContext _db;
     private readonly ILogger<MigrationService> _logger;
 
-    public MigrationService(IServiceProvider provider, ILogger<MigrationService> logger)
+    public MigrationService(ReviewDbContext db, ILogger<MigrationService> logger)
     {
-        _provider = provider;
+        _db = db;
         _logger = logger;
     }
 
@@ -35,11 +35,8 @@ public class MigrationService : IMigrationService
     {
         try
         {
-            using var scope = _provider.CreateScope();
-            var db = scope.ServiceProvider.GetRequiredService<ReviewDbContext>();
-
             _logger.LogInformation("Applying migrations...");
-            await db.Database.MigrateAsync();
+            await _db.Database.MigrateAsync();
             _logger.LogInformation("Migrations applied.");
         }
         catch (Exception ex)
@@ -49,6 +46,7 @@ public class MigrationService : IMigrationService
         }
     }
 }
+
 
 public interface IMigrationService
 {

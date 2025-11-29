@@ -28,18 +28,10 @@ public class GroupRepository : IGroupRepository
     
     public async Task<Result> AddGroupAsync(ReviewGroupEntity groupEntity, CancellationToken cancellationToken)
     {
-        var reviews = groupEntity.Reviews.ToList();
-        groupEntity.Reviews.Clear();
-
+        
         await _context.ReviewGroups.AddAsync(groupEntity, cancellationToken);
         await _context.SaveChangesAsync(cancellationToken);
-
-        foreach (var batch in reviews.Chunk(500))
-        {
-            await _context.Reviews.AddRangeAsync(batch, cancellationToken);
-            await _context.SaveChangesAsync(cancellationToken);
-        }
-
+        
         return Result.Success();
     }
 }
