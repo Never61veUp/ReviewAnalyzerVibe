@@ -39,7 +39,7 @@ public class GroupReviewService : IGroupReviewService
             Text = r.text,
             Confidence = 1,
             GroupId = groupEntity.Id,
-            Index = r.ID,
+            Index = r.id,
             Src = r.src,
             Group = groupEntity
         });
@@ -79,7 +79,7 @@ public class GroupReviewService : IGroupReviewService
     
     public class ReviewInput
     {
-        public int ID { get; set; }
+        public int id { get; set; }
         public string text { get; set; }
         public string src { get; set; }
         public string label { get; set; }

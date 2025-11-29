@@ -9,7 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
 // Add services to the container.
 
-services.AddScoped<IProcessReview, ProcessReviewMoq>();
+services.AddScoped<IProcessReview, ProcessReview>();
 services.AddScoped<IGroupReviewService, GroupReviewService>();
 services.AddScoped<IGroupRepository, GroupRepository>();
 services.AddScoped<IReviewRepository, ReviewRepository>();

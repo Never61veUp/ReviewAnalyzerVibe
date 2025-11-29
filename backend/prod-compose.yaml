@@ -54,6 +54,11 @@ services:
       dockerfile: Dockerfile
     ports:
       - "5173:5173"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.reviewanalyzer.rule=Host(`reviewanalyzer.mixdev.me`)"
+      - "traefik.http.routers.reviewanalyzer.entrypoints=https"
+      - "traefik.http.routers.reviewanalyzer.tls.certresolver=letsencrypt"
 #  ml-model:
 #    image: ml-model
 #    build:

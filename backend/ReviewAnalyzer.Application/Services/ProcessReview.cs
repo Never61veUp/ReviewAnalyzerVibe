@@ -34,7 +34,7 @@ public class ProcessReview : IProcessReview
             
             form.Add(fileContent, "file", fileName);
 
-            var response = await _http.PostAsync("/api/csv/analyze", form, cancellationToken);
+            var response = await _http.PostAsync("labels/file", form, cancellationToken);
             response.EnsureSuccessStatusCode();
 
             var resultBytes = await response.Content.ReadAsByteArrayAsync(cancellationToken);
