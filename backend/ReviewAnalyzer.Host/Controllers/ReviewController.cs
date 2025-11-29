@@ -14,17 +14,17 @@ public class ReviewController : BaseController
         _service = service;
     }
 
-    [HttpGet("{groupId}")]
+    [HttpGet("{groupId:guid}")]
     public async Task<IActionResult> Get(Guid groupId, int count, CancellationToken cancellationToken)
     {
         var result = await _service.GetByGroupId(groupId, count, cancellationToken);
         return FromResult(result);
     }
     
-    [HttpGet("{title}")]
-    public async Task<IActionResult> Get(string titile, int count, CancellationToken cancellationToken)
+    [HttpGet("by-title/{title}")]
+    public async Task<IActionResult> Get(string title, int count, CancellationToken cancellationToken)
     {
-        var result = await _service.FilterTitle(titile, count, cancellationToken);
+        var result = await _service.FilterTitle(title, count, cancellationToken);
         return FromResult(result);
     }
 }
