@@ -31,8 +31,7 @@ public class GroupController : BaseController
             await file.CopyToAsync(ms, cancellationToken);
             csvBytes = ms.ToArray();
         }
-
-        // вызываем твой сервис (реальный или мок)
+        
         var result = await _groupReviewService.AddGroupReview(csvBytes, file.FileName, cancellationToken);
         
         

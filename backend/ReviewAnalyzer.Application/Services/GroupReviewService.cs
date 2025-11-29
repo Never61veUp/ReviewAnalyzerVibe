@@ -4,6 +4,7 @@ using System.Text.RegularExpressions;
 using CSharpFunctionalExtensions;
 using CsvHelper;
 using CsvHelper.Configuration;
+using ReviewAnalyzer.Core.Model;
 using ReviewAnalyzer.PostgreSql.Model;
 using ReviewAnalyzer.PostgreSql.Repositories;
 
@@ -40,7 +41,8 @@ public class GroupReviewService : IGroupReviewService
         {
             Id = Guid.NewGuid(),
             Text = r.text,
-            Confidence = 1,
+            Labels = (Label)r.labels,
+            Confidence = r.confidence,
             GroupId = groupEntity.Id,
             Index = r.ID,
             Src = r.src,
@@ -85,7 +87,7 @@ public class GroupReviewService : IGroupReviewService
         public int ID { get; set; }
         public string text { get; set; }
         public string src { get; set; }
-        public string labels { get; set; }
+        public int labels { get; set; }
         public double confidence { get; set; }
     }
 }
