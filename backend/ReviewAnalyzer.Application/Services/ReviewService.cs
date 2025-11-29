@@ -54,4 +54,6 @@ public class ReviewService : IReviewService
         
         return Result.Success<IEnumerable<Review>>(reviews);
     }
+    
+    public async Task<Result<int>> GetReviewCount(CancellationToken cancellationToken) => await _repository.GetReviewCount(cancellationToken);
 }

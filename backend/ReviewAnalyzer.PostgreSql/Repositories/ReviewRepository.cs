@@ -66,4 +66,10 @@ public class ReviewRepository : IReviewRepository
             return Result.Failure<IEnumerable<ReviewEntity>>(ex.Message);
         }
     }
+
+    public async Task<Result<int>> GetReviewCount(CancellationToken cancellationToken)
+    {
+        var result = await _context.Reviews.CountAsync(cancellationToken: cancellationToken);
+        return Result.Success(result);
+    }
 }

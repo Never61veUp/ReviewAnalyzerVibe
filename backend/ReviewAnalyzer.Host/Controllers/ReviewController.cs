@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using CSharpFunctionalExtensions;
+using Microsoft.AspNetCore.Mvc;
 using ReviewAnalyzer.Application.Services;
 
 namespace ReviewAnalyzer.Host.Controllers;
@@ -47,4 +48,10 @@ public class ReviewController : BaseController
             await writer.FlushAsync(cancellationToken);
         }
     }
+
+    [HttpGet("review-count")]
+    public async Task<IActionResult> GetReviewCount(CancellationToken cancellationToken = default) => 
+        FromResult(await _service.GetReviewCount(cancellationToken));
+    
+        
 }
