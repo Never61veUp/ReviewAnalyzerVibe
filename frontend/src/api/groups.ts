@@ -1,57 +1,34 @@
-import {
-  Review,
-  ReviewRequest,
-  ReviewResponse,
-  Group,
-  GroupsResponse,
-  FileUploadResponse
-} from "../api/api";
+import { useState, useEffect } from "react";
+import { Group, Review } from "./api";
+import { fetchGroups, fetchGroupReviews } from "./client";
 
-const BASE_URL = "https://api.reviewanalyzer.mixdev.me/api";
+export function useGroups() {
+  const [groups, setGroups] = useState<Group[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-export async function fetchGroups(): Promise<GroupsResponse> {
-  const res = await fetch(`${BASE_URL}/Group`);
-  if (!res.ok) throw new Error("Ошибка при получении групп");
-  return await res.json();
+  useEffect(() => {
+    fetchGroups()
+      .then((res) => setGroups(res.result)) 
+      .catch((e) => setError(e.message))
+      .finally(() => setLoading(false));
+  }, []);
+
+  return { groups, loading, error };
 }
 
-export async function uploadText(text: string): Promise<ReviewResponse> {
-  const res = await fetch(`${BASE_URL}/Review`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ review: text }),
-  });
+export function useGroupReviews(groupId: string) {
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  if (!res.ok) throw new Error("Ошибка анализа текста");
-  return await res.json();
-}
+  useEffect(() => {
+    if (!groupId) return;
+    fetchGroupReviews(groupId)
+      .then(setReviews)
+      .catch((e) => setError(e.message))
+      .finally(() => setLoading(false));
+  }, [groupId]);
 
-export async function fetchReview(id: string): Promise<ReviewResponse> {
-  const res = await fetch(`${BASE_URL}/Review/${id}`);
-  if (!res.ok) throw new Error("Ошибка при получении отзыва");
-  return await res.json();
-}
-
-export async function uploadFile(file: File): Promise<FileUploadResponse> {
-  const fd = new FormData();
-  fd.append("file", file);
-
-  const res = await fetch(`${BASE_URL}/Group`, {
-    method: "POST",
-    body: fd
-  });
-
-  if (!res.ok) throw new Error("Ошибка загрузки файла");
-  return await res.json();
-}
-
-export async function createGroup(name: string, text: string): Promise<Group> {
-  const res = await fetch(`${BASE_URL}/Group/postGroup?groupName=${encodeURIComponent(name)}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(text)
-  });
-
-  if (!res.ok) throw new Error("Ошибка создания группы");
-  return await res.json();
+  return { reviews, loading, error };
 }

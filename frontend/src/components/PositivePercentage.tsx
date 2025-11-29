@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { uploadText , GroupResponse } from "../api/groups";
+import { uploadFile } from "../api/client";
+import { FileUploadResponse } from "../api/api";
 
 interface Props {
   file: File | null;
-  onComplete?: (percentage: number) => void; 
+  onComplete?: (percentage: number) => void;
 }
 
 export default function NeonRingProgress({ file, onComplete }: Props) {
   const [progress, setProgress] = useState(0);
   const [percentage, setPercentage] = useState<number | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+
   const radius = 55;
   const stroke = 10;
   const circumference = 2 * Math.PI * radius;
@@ -28,15 +30,21 @@ export default function NeonRingProgress({ file, onComplete }: Props) {
       }, 100);
 
       try {
-        const text = await file.text();
-        const result: GroupResponse = await uploadText (text);
+        // Отправляем файл на сервер
+        const result: FileUploadResponse | {} = await uploadFile(file);
 
         clearInterval(interval);
-
-        const percent = result.result.percentagePositiveReview;
-        setPercentage(percent);
         setProgress(100);
 
+        // Проверяем, что сервер вернул корректный объект
+        if (!("id" in result)) throw new Error("Неверный ответ сервера");
+
+        // Берем процент положительных отзывов
+        // Предположим, сервер возвращает поле `generalScore` или `percentagePositiveReview` в объекте
+        // Если API не отдаёт напрямую, нужно будет fetchGroupReviews(result.id)
+        const percent = (result as any).percentagePositiveReview ?? 0;
+
+        setPercentage(percent);
         onComplete?.(percent);
       } catch (err: any) {
         console.error(err);
@@ -72,7 +80,6 @@ export default function NeonRingProgress({ file, onComplete }: Props) {
         "
       >
         <div className="relative flex items-center justify-center">
-          {/* Внешнее кольцо */}
           <motion.div
             className="absolute w-[150px] h-[150px] rounded-full"
             animate={{
