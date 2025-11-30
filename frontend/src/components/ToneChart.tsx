@@ -38,9 +38,6 @@ export default function ToneChart({ data }: Props) {
       transition={{ duration: 0.6, ease: "easeOut" }}
       className="w-full p-4"
     >
-      <h2 className="text-xl font-bold mb-4 text-[var(--text)]">
-        Динамика тональности отзывов
-      </h2>
 
       <div style={{ width: "100%", height: chartHeight }}>
         <ResponsiveContainer width="100%" height="100%">
