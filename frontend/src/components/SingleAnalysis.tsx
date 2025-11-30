@@ -112,9 +112,8 @@ export default function SingleAnalysis({ textInput, setTextInput }: Props) {
           style={{ backgroundColor: "var(--background)/30", borderColor: borderGray, color: "var(--text)" }}
         />
         <button
-          className={`py-4 rounded-2xl text-lg font-semibold tracking-wide text-white shadow-[0_0_20px_var(--primary)/60] hover:shadow-[0_0_35px_var(--primary)/80] hover:-translate-y-1 transition-all ${
-            isAnalyzing ? "opacity-70 cursor-not-allowed" : ""
-          }`}
+          className={`py-4 rounded-2xl text-lg font-semibold tracking-wide text-white shadow-[0_0_20px_var(--primary)/60] hover:shadow-[0_0_35px_var(--primary)/80] hover:-translate-y-1 transition-all ${isAnalyzing ? "opacity-70 cursor-not-allowed" : ""
+            }`}
           style={{ backgroundColor: "var(--primary)" }}
           onClick={handleAnalyze}
           disabled={isAnalyzing}

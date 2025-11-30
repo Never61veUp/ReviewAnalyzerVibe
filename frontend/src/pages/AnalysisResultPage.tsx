@@ -84,8 +84,8 @@ export default function AnalysisResultPage() {
       const reviews: Review[] = Array.isArray(reviewsResponse)
         ? reviewsResponse
         : Array.isArray((reviewsResponse as any).result)
-        ? (reviewsResponse as any).result
-        : [];
+          ? (reviewsResponse as any).result
+          : [];
 
       const searchGroup: UploadedGroup = {
         id: "search",

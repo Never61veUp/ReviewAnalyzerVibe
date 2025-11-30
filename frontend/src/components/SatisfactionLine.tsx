@@ -53,9 +53,6 @@ export default function SatisfactionLine({ reviews }: Props) {
 
   return (
     <div className="w-full h-full p-4 flex flex-col">
-      <h3 className="text-lg font-semibold mb-3 tracking-wide" style={{ color: "var(--primary)" }}>
-        Удовлетворенность граждан
-      </h3>
 
       <div className="relative w-full h-10 rounded-full backdrop-blur-xl border border-white/20 overflow-hidden bg-[var(--line-bg)]">
 

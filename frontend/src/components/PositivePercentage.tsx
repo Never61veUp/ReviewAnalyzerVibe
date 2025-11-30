@@ -7,14 +7,14 @@ interface Props {
 }
 
 interface ApiResponse {
-  result: number; // процент позитивных отзывов
+  result: number;
   errorMessage: string | null;
   timeGenerated: string;
 }
 
-export default function NeonProgress({ groupId, onComplete }: Props) {
+export default function PositivePercentage({ groupId, onComplete }: Props) {
   const [percentage, setPercentage] = useState<number | null>(null);
-  const [progress, setProgress] = useState(0);
+  const [displayed, setDisplayed] = useState(0);
   const [loading, setLoading] = useState(true);
 
   const radius = 70;
@@ -26,32 +26,35 @@ export default function NeonProgress({ groupId, onComplete }: Props) {
 
     const fetchPercentage = async () => {
       setLoading(true);
-      setProgress(0);
-
-      // имитация прогресса
-      const interval = setInterval(() => {
-        setProgress((prev) => Math.min(prev + 5, 90));
-      }, 50);
+      setPercentage(null);
+      setDisplayed(0);
 
       try {
         const res = await fetch(
-          `https://api.reviewanalyzer.mixdev.me/Review/review-percent-positive?groupId=${groupId}`
+          `https://api.reviewanalyzer.mixdev.me/Review/review-percent-positive-in-group${groupId}?neutralCoeff=0`
         );
 
         if (!res.ok) throw new Error(`Ошибка запроса: ${res.status}`);
 
         const data: ApiResponse = await res.json();
-        clearInterval(interval);
+        const percent = Math.max(0, Math.min(data.result ?? 0, 100));
+        setPercentage(percent);
+        onComplete?.(percent);
 
-        setPercentage(data.result ?? 0);
-        setProgress(100);
-
-        onComplete?.(data.result ?? 0);
-      } catch (err: any) {
+        let current = 0;
+        const step = percent / 50;
+        const interval = setInterval(() => {
+          current += step;
+          if (current >= percent) {
+            current = percent;
+            clearInterval(interval);
+          }
+          setDisplayed(current);
+        }, 20);
+      } catch (err) {
         console.error(err);
-        clearInterval(interval);
-        setProgress(0);
-        setPercentage(null);
+        setPercentage(0);
+        setDisplayed(0);
       } finally {
         setLoading(false);
       }
@@ -60,19 +63,19 @@ export default function NeonProgress({ groupId, onComplete }: Props) {
     fetchPercentage();
   }, [groupId, onComplete]);
 
-  const offset = circumference - ((progress / 100) * circumference);
+  const offset = circumference - ((percentage ?? 0) / 100) * circumference;
 
   const getColor = () => {
     if (percentage === null) return "#4ade80";
-    if (percentage < 40) return "#f87171"; // красный
-    if (percentage < 70) return "#facc15"; // желтый
-    return "#4ade80"; // зеленый
+    if (percentage < 40) return "#f87171";
+    if (percentage < 70) return "#facc15";
+    return "#4ade80";
   };
 
   return (
     <div className="flex flex-col items-center justify-center p-4">
       <div className="relative w-[180px] h-[180px]">
-        {/* Неоновый мерцающий эффект */}
+
         <motion.div
           className="absolute top-0 left-0 w-full h-full rounded-full"
           animate={{
@@ -87,7 +90,7 @@ export default function NeonProgress({ groupId, onComplete }: Props) {
         />
 
         <svg width="180" height="180" className="rotate-[-90deg]">
-          {/* Фон круга */}
+
           <circle
             cx="90"
             cy="90"
@@ -96,7 +99,7 @@ export default function NeonProgress({ groupId, onComplete }: Props) {
             strokeWidth={stroke}
             fill="none"
           />
-          {/* Прогресс */}
+
           <circle
             cx="90"
             cy="90"
@@ -105,23 +108,25 @@ export default function NeonProgress({ groupId, onComplete }: Props) {
             strokeWidth={stroke}
             fill="none"
             strokeDasharray={circumference}
-            strokeDashoffset={offset}
+            strokeDashoffset={circumference - (displayed / 100) * circumference}
             strokeLinecap="round"
             style={{ transition: "stroke-dashoffset 0.3s ease" }}
           />
         </svg>
 
-        {/* Текст внутри круга */}
+
         <div className="absolute inset-0 flex flex-col items-center justify-center">
           <p className="text-3xl font-bold text-[var(--text)]">
-            {percentage !== null ? `${percentage.toFixed(1)}%` : `${progress}%`}
+            {displayed.toFixed(1)}%
           </p>
-          <p className="text-sm text-[var(--text)]/70 mt-1">Позитивные отзывы</p>
+
         </div>
       </div>
 
-      {/* Сообщение при загрузке */}
-      {loading && <p className="text-center mt-2 text-[var(--text)]/70">Загрузка...</p>}
+
+      {loading && (
+        <p className="text-center mt-2 text-[var(--text)]/70">Загрузка...</p>
+      )}
       {!loading && percentage === null && (
         <p className="text-center mt-2 text-red-500">Нет данных по этой группе</p>
       )}
