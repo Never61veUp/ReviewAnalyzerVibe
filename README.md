@@ -1,7 +1,8 @@
 # Web Application Russian Sentiment Analysis with BERT
 https://api.reviewanalyzer.mixdev.me/scalar/v1
 
-[hosting: https://reviewanalyzer.mixdev.me/](https://reviewanalyzer.mixdev.me/)
+[hosting: https://reviewanalyzer.mixdev.me/](https://reviewanalyzer.mixdev.me/) </br>
+
 https://drive.google.com/file/d/1RV2m6gSoC8mDG_OfrWlgLPMwgHn7nMV8/view?usp=sharing
 ## Структура
 **[/backend]()** - бэкэнд для веб приложения, обеспечивающее хранение отзывов их анализ и сообщение с сервером модели.
