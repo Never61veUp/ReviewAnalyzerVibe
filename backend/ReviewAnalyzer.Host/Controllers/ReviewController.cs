@@ -58,7 +58,7 @@ public class ReviewController : BaseController
     public async Task<IActionResult> GetPercentPositiveReview(CancellationToken cancellationToken = default) => 
         FromResult(await _service.GetPercentPositiveReview(cancellationToken));
     
-    [HttpGet("review-positive-count")]
+    [HttpGet("review-label-count")]
     public async Task<IActionResult> GetPositiveReviewCount(CancellationToken cancellationToken, Label label = Label.Положительный) => 
         FromResult(await _service.GetLabelReviewCount(cancellationToken, label));
     
