@@ -1,124 +1,94 @@
-import React, { useEffect, useState } from "react";
+import React, { useMemo } from "react";
 import {
-  LineChart,
-  Line,
+  BarChart,
+  Bar,
   XAxis,
   YAxis,
   Tooltip,
   CartesianGrid,
-  ResponsiveContainer
+  ResponsiveContainer,
 } from "recharts";
 import { motion } from "framer-motion";
-import { uploadFile } from "../api/client";
-import { Group, FileUploadResponse } from "../api/api";
-
-interface GraphItem {
-  date: string;
-  score: number;
-}
 
 interface Props {
-  file: File | null;
+  data: Record<string, number>; 
 }
 
-const ToneChart: React.FC<Props> = ({ file }) => {
-  const [graphData, setGraphData] = useState<GraphItem[]>([]);
-  const [loading, setLoading] = useState(false);
+export default function ToneChart({ data }: Props) {
+  const graphData = useMemo(() => {
+    if (!data) return [];
+    return Object.entries(data).map(([src, percent]) => ({
+      src,
+      percent: Number(percent), 
+    }));
+  }, [data]);
 
-  useEffect(() => {
-    if (!file) return;
+  console.log("Graph Data:", graphData);
 
-    const analyze = async () => {
-      setLoading(true);
-      setGraphData([]);
+  if (!graphData.length)
+    return <p className="text-center text-[var(--text)]">Нет данных для графика</p>;
 
-      try {
-        // Загружаем CSV на сервер
-        const result: FileUploadResponse | {} = await uploadFile(file);
 
-        if (!("id" in result)) {
-          setGraphData([]);
-          return;
-        }
-
-        // Берем группы (если бэк возвращает несколько групп)
-        const groups: Group[] = (result as any).groups ?? [];
-
-        if (!groups.length) {
-          setGraphData([]);
-          return;
-        }
-
-        // Создаем данные для графика
-        const data: GraphItem[] = groups.map((group) => ({
-          date: group.date ? new Date(group.date).toLocaleDateString() : "—",
-          score: Math.round((group.generalScore ?? 0) * 100),
-        }));
-
-        setGraphData(data);
-      } catch (err) {
-        console.error("Ошибка при загрузке графика:", err);
-        setGraphData([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    analyze();
-  }, [file]);
-
-  if (!file) return <p className="text-center text-[var(--text)]">Загрузите CSV файл</p>;
-  if (loading) return <p className="text-center text-[var(--text)]">Анализируется...</p>;
-  if (graphData.length === 0) return <p className="text-center text-[var(--text)]">Нет данных для графика</p>;
+  const chartHeight = Math.max(300, graphData.length * 60);
 
   return (
     <motion.section
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
-      className="w-full h-full p-4"
+      className="w-full p-4"
     >
-      <div className="w-full h-60">
+      <h2 className="text-xl font-bold mb-4 text-[var(--text)]">
+        Динамика тональности отзывов
+      </h2>
+
+      <div style={{ width: "100%", height: chartHeight }}>
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={graphData}>
-            <defs>
-              <linearGradient id="lineGradient" x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0%" stopColor="var(--primary)" />
-                <stop offset="50%" stopColor="var(--accent)" />
-                <stop offset="100%" stopColor="var(--secondary)" />
-              </linearGradient>
-            </defs>
-
+          <BarChart
+            data={graphData}
+            layout="vertical"
+            margin={{ top: 20, right: 20, left: 80, bottom: 20 }}
+          >
             <CartesianGrid strokeDasharray="3 3" stroke="var(--grid)" />
-            <XAxis dataKey="date" stroke="var(--text)" tick={{ fill: "var(--text)" }} />
-            <YAxis domain={[0, 100]} stroke="var(--text)" tick={{ fill: "var(--text)" }} />
-
+            <XAxis
+              type="number"
+              domain={[0, 100]}
+              stroke="var(--text)"
+              tick={{ fill: "var(--text)" }}
+            />
+            <YAxis
+              type="category"
+              dataKey="src"
+              stroke="var(--text)"
+              tick={{ fill: "var(--text)" }}
+            />
             <Tooltip
               contentStyle={{
                 background: "var(--tooltip-bg)",
                 backdropFilter: "blur(6px)",
                 borderRadius: "10px",
                 border: "1px solid var(--tooltip-border)",
-                color: "var(--text)"
+                color: "var(--text)",
               }}
+              formatter={(value) => [`${value}%`, "Позитивность"]}
+              labelFormatter={(label) => `Источник: ${label}`}
             />
-
-            <Line
-              type="monotone"
-              dataKey="score"
-              stroke="url(#lineGradient)"
-              strokeWidth={3}
-              dot={{ r: 4, fill: "var(--accent)", stroke: "var(--accent)" }}
-              activeDot={{ r: 6, fill: "var(--accent)", stroke: "#fff", strokeWidth: 2 }}
-              isAnimationActive={true}
-              animationDuration={1000}
-              animationEasing="ease-out"
+            <Bar
+              dataKey="percent"
+              radius={[4, 4, 4, 4]}
+              isAnimationActive
+              fill="url(#barGradient)"
             />
-          </LineChart>
+            <defs>
+              <linearGradient id="barGradient" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stopColor="#33cc6a" />
+                <stop offset="50%" stopColor="#27ae60" />
+                <stop offset="100%" stopColor="#4ade80" />
+              </linearGradient>
+            </defs>
+          </BarChart>
         </ResponsiveContainer>
       </div>
     </motion.section>
   );
-};
-
-export default ToneChart;
+}

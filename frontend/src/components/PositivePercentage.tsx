@@ -1,134 +1,130 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { uploadFile } from "../api/client";
-import { FileUploadResponse } from "../api/api";
 
 interface Props {
-  file: File | null;
+  groupId: string;
   onComplete?: (percentage: number) => void;
 }
 
-export default function NeonRingProgress({ file, onComplete }: Props) {
-  const [progress, setProgress] = useState(0);
-  const [percentage, setPercentage] = useState<number | null>(null);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
+interface ApiResponse {
+  result: number; // процент позитивных отзывов
+  errorMessage: string | null;
+  timeGenerated: string;
+}
 
-  const radius = 55;
-  const stroke = 10;
+export default function NeonProgress({ groupId, onComplete }: Props) {
+  const [percentage, setPercentage] = useState<number | null>(null);
+  const [progress, setProgress] = useState(0);
+  const [loading, setLoading] = useState(true);
+
+  const radius = 70;
+  const stroke = 12;
   const circumference = 2 * Math.PI * radius;
 
   useEffect(() => {
-    if (!file) return;
+    if (!groupId) return;
 
-    const analyzeFile = async () => {
-      setIsAnalyzing(true);
+    const fetchPercentage = async () => {
+      setLoading(true);
       setProgress(0);
-      setPercentage(null);
 
+      // имитация прогресса
       const interval = setInterval(() => {
         setProgress((prev) => Math.min(prev + 5, 90));
-      }, 100);
+      }, 50);
 
       try {
-        // Отправляем файл на сервер
-        const result: FileUploadResponse | {} = await uploadFile(file);
+        const res = await fetch(
+          `https://api.reviewanalyzer.mixdev.me/Review/review-percent-positive?groupId=${groupId}`
+        );
 
+        if (!res.ok) throw new Error(`Ошибка запроса: ${res.status}`);
+
+        const data: ApiResponse = await res.json();
         clearInterval(interval);
+
+        setPercentage(data.result ?? 0);
         setProgress(100);
 
-        // Проверяем, что сервер вернул корректный объект
-        if (!("id" in result)) throw new Error("Неверный ответ сервера");
-
-        // Берем процент положительных отзывов
-        // Предположим, сервер возвращает поле `generalScore` или `percentagePositiveReview` в объекте
-        // Если API не отдаёт напрямую, нужно будет fetchGroupReviews(result.id)
-        const percent = (result as any).percentagePositiveReview ?? 0;
-
-        setPercentage(percent);
-        onComplete?.(percent);
+        onComplete?.(data.result ?? 0);
       } catch (err: any) {
         console.error(err);
         clearInterval(interval);
         setProgress(0);
+        setPercentage(null);
       } finally {
-        setIsAnalyzing(false);
+        setLoading(false);
       }
     };
 
-    analyzeFile();
-  }, [file, onComplete]);
+    fetchPercentage();
+  }, [groupId, onComplete]);
 
-  const offset = circumference - (progress / 100) * circumference;
+  const offset = circumference - ((progress / 100) * circumference);
 
   const getColor = () => {
-    const value = percentage !== null ? percentage : progress;
-    if (value < 40) return "#e74c3c";
-    if (value < 70) return "#f1c40f";
-    return "#27ae60";
+    if (percentage === null) return "#4ade80";
+    if (percentage < 40) return "#f87171"; // красный
+    if (percentage < 70) return "#facc15"; // желтый
+    return "#4ade80"; // зеленый
   };
 
   return (
-    <div className="w-full h-full p-4 flex items-center justify-center">
-      <div
-        className="
-          w-full h-full
-          flex flex-col items-center justify-center
-          rounded-2xl p-4
-          bg-[var(--card)]
-          border border-[var(--border)]
-          shadow-[0_0_15px_var(--primary)/10]
-        "
-      >
-        <div className="relative flex items-center justify-center">
-          <motion.div
-            className="absolute w-[150px] h-[150px] rounded-full"
-            animate={{
-              boxShadow: [
-                "0 0 8px var(--primary)",
-                "0 0 14px var(--primary)",
-                "0 0 8px var(--primary)",
-              ],
-            }}
-            transition={{ duration: 2, repeat: Infinity }}
-            style={{ border: "3px solid var(--primary)" }}
+    <div className="flex flex-col items-center justify-center p-4">
+      <div className="relative w-[180px] h-[180px]">
+        {/* Неоновый мерцающий эффект */}
+        <motion.div
+          className="absolute top-0 left-0 w-full h-full rounded-full"
+          animate={{
+            boxShadow: [
+              `0 0 10px ${getColor()}`,
+              `0 0 20px ${getColor()}`,
+              `0 0 10px ${getColor()}`,
+            ],
+          }}
+          transition={{ duration: 2, repeat: Infinity }}
+          style={{ border: `4px solid ${getColor()}` }}
+        />
+
+        <svg width="180" height="180" className="rotate-[-90deg]">
+          {/* Фон круга */}
+          <circle
+            cx="90"
+            cy="90"
+            r={radius}
+            stroke="var(--border)"
+            strokeWidth={stroke}
+            fill="none"
           />
+          {/* Прогресс */}
+          <circle
+            cx="90"
+            cy="90"
+            r={radius}
+            stroke={getColor()}
+            strokeWidth={stroke}
+            fill="none"
+            strokeDasharray={circumference}
+            strokeDashoffset={offset}
+            strokeLinecap="round"
+            style={{ transition: "stroke-dashoffset 0.3s ease" }}
+          />
+        </svg>
 
-          <svg width="160" height="160" className="rotate-[-90deg]">
-            <circle
-              cx="80"
-              cy="80"
-              r={radius}
-              stroke="var(--border)"
-              strokeWidth={stroke}
-              fill="none"
-            />
-            <circle
-              cx="80"
-              cy="80"
-              r={radius}
-              stroke={getColor()}
-              strokeWidth={stroke}
-              fill="none"
-              strokeDasharray={circumference}
-              strokeDashoffset={offset}
-              strokeLinecap="round"
-              style={{ transition: "stroke-dashoffset 0.2s linear" }}
-            />
-          </svg>
-
-          <div className="absolute text-center">
-            <p className="text-[var(--text)] text-2xl font-bold">
-              {percentage !== null ? `${percentage}%` : `${progress}%`}
-            </p>
-          </div>
+        {/* Текст внутри круга */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center">
+          <p className="text-3xl font-bold text-[var(--text)]">
+            {percentage !== null ? `${percentage.toFixed(1)}%` : `${progress}%`}
+          </p>
+          <p className="text-sm text-[var(--text)]/70 mt-1">Позитивные отзывы</p>
         </div>
-
-        <p className="mt-4 text-sm text-[var(--text)]/70 font-medium">
-          {percentage !== null
-            ? "Результат анализа"
-            : "Текущий прогресс анализа"}
-        </p>
       </div>
+
+      {/* Сообщение при загрузке */}
+      {loading && <p className="text-center mt-2 text-[var(--text)]/70">Загрузка...</p>}
+      {!loading && percentage === null && (
+        <p className="text-center mt-2 text-red-500">Нет данных по этой группе</p>
+      )}
     </div>
   );
 }
