@@ -77,7 +77,7 @@ public class ReviewService : IReviewService
     public async Task<Result<Review>> ParseOneReview(string review, CancellationToken cancellationToken = default)
     {
         var bytes = System.Text.Encoding.UTF8.GetBytes(review);
-        var csvResult = await _processReview.AnalyzeCsvAsync(bytes, "", cancellationToken);
+        var csvResult = await _processReview.AnalyzeCsvAsync(bytes, "gg", cancellationToken);
         var input = CsvParser.ParseCsv(csvResult.Value);
         if(input.Count == 0)
             return Result.Failure<Review>("ml service error");
