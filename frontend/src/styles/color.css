@@ -6,6 +6,8 @@
   --accent: #6aa7d2;
   --border: #dee1e6;
   --input-bg: #f1f5f9;
+  --input-border: #d1d5db;
+  --text-muted: #4b5563;
 }
 
 [data-theme="dark"] {
@@ -16,6 +18,8 @@
   --accent: #26506d;
   --border: #374151;
   --input-bg: #272c35;
+  --text-muted: #d1d5db;
+  --input-border: #4b5563;
 }
 
 :root {

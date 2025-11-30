@@ -32,7 +32,15 @@ export default function SearchBar({ searchQuery, setSearchQuery, onSearch, searc
                     <input
                         type="text"
                         placeholder="Поиск отзывов по ключевым словам"
-                        className="w-full p-2 pr-10 rounded-lg border border-gray-400"
+                        className="
+                            w-full p-2 pr-10 rounded-lg border
+                            border-[var(--input-border)]
+                            bg-[var(--input-background)]
+                            text-[var(--text)]
+                            placeholder:text-[var(--text-muted)]
+                            focus:outline-none focus:ring-2 focus:ring-[var(--primary)]
+                            transition-colors
+                        "
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         onKeyDown={(e) => e.key === "Enter" && handleSearch()}
@@ -40,7 +48,7 @@ export default function SearchBar({ searchQuery, setSearchQuery, onSearch, searc
                     {searchQuery && (
                         <button
                             type="button"
-                            className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                            className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-200 transition-colors"
                             onClick={handleClear}
                         >
                             <FaTimes />
@@ -49,7 +57,7 @@ export default function SearchBar({ searchQuery, setSearchQuery, onSearch, searc
                 </div>
 
                 <button
-                    className="px-4 py-2 bg-[var(--primary)] text-white rounded-2xl font-semibold"
+                    className="px-4 py-2 bg-[var(--primary)] text-white rounded-2xl font-semibold hover:opacity-90 transition"
                     onClick={handleSearch}
                     disabled={searching}
                 >

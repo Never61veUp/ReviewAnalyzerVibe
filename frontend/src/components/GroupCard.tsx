@@ -22,7 +22,7 @@ export default function GroupCard({ group, toggleGroup, handleExport, searchQuer
     const totalReviews = group.reviews?.length || 0;
 
     return (
-        <div className="p-6 rounded-2xl bg-[var(--secondary)]/5 border border-[var(--border)]/20 shadow-md transition-all">
+        <div className="p-6 rounded-2xl bg-[var(--secondary)]/5 border border-[var(--input-border)]/20 shadow-md transition-all">
             <div className="flex justify-between items-center mb-2">
                 <div>
                     <h2 className="text-xl font-bold text-[var(--text)]">{group.name}</h2>

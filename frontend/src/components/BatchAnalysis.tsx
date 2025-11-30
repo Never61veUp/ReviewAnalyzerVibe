@@ -32,7 +32,6 @@ export default function BatchAnalysis({ file, setFile }: Props) {
       clearInterval(interval);
       setUploadProgress(100);
 
-      // ✅ Исправленная проверка
       if (result.errorMessage) {
         throw new Error(result.errorMessage || "Ошибка при анализе на сервере");
       }
