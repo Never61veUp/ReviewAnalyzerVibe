@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { fetchGroups, fetchGroupReviews, fetchReviewsByTitle } from "../api/client";
 import { Review } from "../api/api";
+import SearchBar from "../components/SearchBar";
+import GroupCard from "../components/GroupCard";
 
-interface UploadedGroup {
+export interface UploadedGroup {
   id: string;
   name: string;
   date: string;
@@ -37,10 +39,7 @@ export default function AnalysisResultPage() {
             (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
           );
 
-          // только загруженная группа
-          if (uploadedGroups.length > 0) {
-            uploadedGroups[0].justUploaded = true;
-          }
+          if (uploadedGroups.length > 0) uploadedGroups[0].justUploaded = true;
 
           setGroups(uploadedGroups);
         } else {
@@ -134,109 +133,21 @@ export default function AnalysisResultPage() {
     <div className="p-8 max-w-7xl mx-auto space-y-6">
       <h1 className="text-3xl font-bold text-center text-[var(--text)] mb-6">История загруженных файлов</h1>
 
-      {/* поиск */}
-      <div className="flex gap-2 mb-6">
-        <input
-          type="text"
-          placeholder="Поиск отзывов по ключевым словам"
-          className="flex-1 p-2 rounded-lg border border-gray-400"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-        />
-        <button
-          className="px-4 py-2 bg-[var(--primary)] text-white rounded-2xl font-semibold"
-          onClick={handleSearch}
-          disabled={searching}
-        >
-          {searching ? "Идёт поиск..." : "Поиск"}
-        </button>
-      </div>
+      <SearchBar
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        onSearch={handleSearch}
+        searching={searching}
+      />
 
       {groups.map((group) => (
-        <div
+        <GroupCard
           key={group.id}
-          className={`rounded-3xl border border-[var(--border)] shadow-[0_0_25px_var(--accent)/15] backdrop-blur-xl transition-all
-            ${
-              group.id === "search"
-                ? "bg-[var(--primary)]/10"
-                : group.justUploaded
-                ? "bg-blue-100 shadow-lg"
-                : "bg-[var(--background)]/40"
-            }`}
-        >
-
-          <div className="flex justify-between items-center p-6">
-            <div className="cursor-pointer" onClick={() => toggleGroup(group)}>
-              <h2 className="text-xl font-semibold text-[var(--text)]">{group.name}</h2>
-              <p className="text-sm opacity-70 text-[var(--text)]">
-                Загружено: {new Date(group.date).toLocaleString()} | Отзывов: {group.reviewCount ?? 0}
-              </p>
-            </div>
-            <div className="flex gap-2">
-              <button
-                className="px-4 py-2 bg-[var(--primary)] text-white rounded-2xl font-semibold shadow hover:shadow-[0_0_25px_var(--primary)/50] transition-all"
-                onClick={() => toggleGroup(group)}
-              >
-                {group.expanded ? "Свернуть" : "Развернуть"}
-              </button>
-
-              {group.id !== "search" && (
-                <button
-                  className="px-4 py-2 bg-green-500 text-white rounded-2xl font-semibold shadow hover:shadow-[0_0_25px_green]/50 transition-all"
-                  onClick={() => handleExport(group.id, group.name)}
-                >
-                  Экспорт
-                </button>
-              )}
-            </div>
-          </div>
-
-          {/* отзывы */}
-          {group.expanded && group.reviews && Array.isArray(group.reviews) && (
-            <div className="p-6 border-t border-[var(--border)]/30 space-y-4">
-              {group.reviews.length === 0 && <p className="text-gray-400">Нет отзывов</p>}
-              {group.reviews.map((review) => (
-                <div
-                  key={review.id}
-                  className="p-4 rounded-2xl bg-[var(--secondary)]/10 border border-[var(--border)]/30 shadow-[0_0_15px_var(--accent)/10]"
-                >
-                  <div className="flex justify-between items-center mb-2">
-                    <span
-                      className={`px-3 py-1 rounded-full text-sm font-medium ${
-                        review.label === "positive"
-                          ? "bg-green-500/20 text-green-400"
-                          : review.label === "negative"
-                          ? "bg-red-500/20 text-red-400"
-                          : "bg-yellow-500/20 text-yellow-400"
-                      }`}
-                    >
-                      {review.label === "positive"
-                        ? "Позитивный"
-                        : review.label === "negative"
-                        ? "Негативный"
-                        : "Нейтральный"}
-                    </span>
-                    <span className="text-xs opacity-70">{(review.confidence * 100).toFixed(1)}% доверие</span>
-                  </div>
-                  <p className="text-[var(--text)] whitespace-pre-line">
-                    {searchQuery
-                      ? review.text.split(new RegExp(`(${searchQuery})`, "gi")).map((part, i) =>
-                          part.toLowerCase() === searchQuery.toLowerCase() ? (
-                            <span key={i} className="bg-yellow-200">
-                              {part}
-                            </span>
-                          ) : (
-                            <span key={i}>{part}</span>
-                          )
-                        )
-                      : review.text}
-                  </p>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+          group={group}
+          toggleGroup={toggleGroup}
+          handleExport={handleExport}
+          searchQuery={searchQuery}
+        />
       ))}
     </div>
   );

@@ -7,6 +7,7 @@ import Footer from "./components/layout/Footer";
 import Home from "./pages/Home/Home";
 import HowItWorks from "./pages/HowItWorks/HowItWorks";
 import AnalysisResultPage from "./pages/AnalysisResultPage";
+import GroupDetailsPage from "./pages/GroupDetailsPage";
 
 function App() {
   const { theme, toggleTheme } = useTheme();
@@ -23,6 +24,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/how-it-works" element={<HowItWorks />} />
             <Route path="/analysis-result" element={<AnalysisResultPage />} />
+            <Route path="/group/:id" element={<GroupDetailsPage />} />
           </Routes>
         </main>
         <Footer />
