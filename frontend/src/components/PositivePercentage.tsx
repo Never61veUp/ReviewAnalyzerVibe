@@ -42,7 +42,7 @@ export default function PositivePercentage({ groupId, onComplete }: Props) {
         onComplete?.(percent);
 
         let current = 0;
-        const step = percent / 50; 
+        const step = percent / 50;
         const interval = setInterval(() => {
           current += step;
           if (current >= percent) {
@@ -68,14 +68,14 @@ export default function PositivePercentage({ groupId, onComplete }: Props) {
   const getColor = () => {
     if (percentage === null) return "#4ade80";
     if (percentage < 40) return "#f87171";
-    if (percentage < 70) return "#facc15"; 
-    return "#4ade80"; 
+    if (percentage < 70) return "#facc15";
+    return "#4ade80";
   };
 
   return (
     <div className="flex flex-col items-center justify-center p-4">
       <div className="relative w-[180px] h-[180px]">
-        
+
         <motion.div
           className="absolute top-0 left-0 w-full h-full rounded-full"
           animate={{
@@ -90,7 +90,7 @@ export default function PositivePercentage({ groupId, onComplete }: Props) {
         />
 
         <svg width="180" height="180" className="rotate-[-90deg]">
-         
+
           <circle
             cx="90"
             cy="90"
@@ -99,7 +99,7 @@ export default function PositivePercentage({ groupId, onComplete }: Props) {
             strokeWidth={stroke}
             fill="none"
           />
-          
+
           <circle
             cx="90"
             cy="90"
@@ -114,16 +114,16 @@ export default function PositivePercentage({ groupId, onComplete }: Props) {
           />
         </svg>
 
-        
+
         <div className="absolute inset-0 flex flex-col items-center justify-center">
           <p className="text-3xl font-bold text-[var(--text)]">
             {displayed.toFixed(1)}%
           </p>
-          
+
         </div>
       </div>
 
-      
+
       {loading && (
         <p className="text-center mt-2 text-[var(--text)]/70">Загрузка...</p>
       )}

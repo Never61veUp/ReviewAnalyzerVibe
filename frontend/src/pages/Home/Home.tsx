@@ -5,11 +5,10 @@ import HeroSection from "../../components/HeroSection";
 import ModeToggle from "../../components/ModeToggle";
 import SingleAnalysis from "../../components/SingleAnalysis";
 import BatchAnalysis from "../../components/BatchAnalysis";
-import { FaSmile, FaClock, FaCheckCircle } from "react-icons/fa";
+import { FaSmile, FaMeh, FaFrown, FaCheckCircle } from "react-icons/fa";
 import { fetchGroups, fetchReviewCount, fetchPositiveReviewCount } from "../../api/client";
 import { UploadedGroup } from "../AnalysisResultPage";
 
-// --- Анимация чисел ---
 function AnimatedNumber({ value }: { value: number }) {
   const motionValue = useMotionValue(0);
   const rounded = useTransform(motionValue, (latest) => Math.round(latest));
@@ -29,9 +28,21 @@ export default function Home() {
   const [recentGroups, setRecentGroups] = useState<UploadedGroup[]>([]);
   const [totalReviews, setTotalReviews] = useState<number>(0);
   const [positiveReviews, setPositiveReviews] = useState<number>(0);
+  const [neutralReviews, setNeutralReviews] = useState<number>(0);
+  const [negativeReviews, setNegativeReviews] = useState<number>(0);
   const navigate = useNavigate();
+  const fetchLabelCount = async (label: number) => {
+  try {
+    const resp = await fetch(`https://api.reviewanalyzer.mixdev.me/Review/review-label-count?label=${label}`);
+    if (!resp.ok) return 0;
+    const data = await resp.json();
+    return data.result ?? 0;
+  } catch (err) {
+    console.error(`Не удалось получить число отзывов для label=${label}:`, err);
+    return 0;
+  }
+};
 
-  // --- ЗАГРУЗКА 5 ПОСЛЕДНИХ ГРУПП ---
   useEffect(() => {
     const loadGroups = async () => {
       try {
@@ -49,7 +60,6 @@ export default function Home() {
     loadGroups();
   }, []);
 
-  // --- ЗАГРУЗКА общего числа отзывов ---
   useEffect(() => {
     const loadReviewCount = async () => {
       try {
@@ -63,21 +73,21 @@ export default function Home() {
     loadReviewCount();
   }, []);
 
-  // --- ЗАГРУЗКА числа позитивных отзывов ---
-  useEffect(() => {
-    const loadPositiveCount = async () => {
-      try {
-        const resp = await fetchPositiveReviewCount();
-        setPositiveReviews(resp.count);
-      } catch (err) {
-        console.error("Не удалось получить число позитивных отзывов:", err);
-        setPositiveReviews(0);
-      }
-    };
-    loadPositiveCount();
-  }, []);
+useEffect(() => {
+  const loadCounts = async () => {
+    const positive = await fetchLabelCount(1);
+    const neutral = await fetchLabelCount(0);
+    const negative = await fetchLabelCount(2);
 
-  // --- Функция анализа текста ---
+    setPositiveReviews(positive);
+    setNeutralReviews(neutral);
+    setNegativeReviews(negative);
+
+    setTotalReviews(positive + neutral + negative);
+  };
+  loadCounts();
+}, []);
+
   const handleTextAnalyze = () => {
     if (!textInput.trim()) return;
 
@@ -109,33 +119,34 @@ export default function Home() {
     navigate("/analysis-result", { state: { data: groupResponse } });
   };
 
-  // --- Данные карточек ---
+  // --- карточкик ---
   const stats = [
-    { 
-      label: "Проанализировано отзывов", 
-      value: totalReviews, 
-      icon: <FaCheckCircle size={28} className="text-[var(--primary)]" />, 
-      sparkline: [3, 5, 2, 8, 4, 6, 7]
-    },
-    { 
-      label: "Активность сегодня", 
-      value: 24, 
-      icon: <FaClock size={28} className="text-yellow-400" />, 
-      sparkline: [2, 4, 6, 3, 5, 7, 4]
-    },
-    { 
-      label: "Самый быстрый анализ", 
-      value: 0.7, 
-      icon: <FaClock size={28} className="text-blue-400" />, 
-      sparkline: [1, 0.9, 0.8, 0.7, 0.9, 0.6, 0.7]
-    },
-    { 
-      label: "Позитивных отзывов", 
-      value: positiveReviews, 
-      icon: <FaSmile size={28} className="text-green-400" />, 
-      sparkline: [60, 62, 64, 65, 66, 67, 68]
-    }
-  ];
+  { 
+    label: "Проанализировано отзывов", 
+    value: totalReviews, 
+    icon: <FaCheckCircle size={28} className="text-[var(--primary)]" />, 
+    sparkline: [3, 5, 2, 8, 4, 6, 7]
+  },
+  { 
+    label: "Позитивных отзывов", 
+    value: positiveReviews, 
+    icon: <FaSmile size={28} className="text-green-400" />, 
+    sparkline: [60, 62, 64, 65, 66, 67, 68]
+  },
+  { 
+    label: "Нейтральных отзывов", 
+    value: neutralReviews, 
+    icon: <FaMeh size={28} className="text-yellow-400" />, 
+    sparkline: [10, 12, 11, 9, 14, 10, 13]
+  },
+  { 
+    label: "Негативных отзывов", 
+    value: negativeReviews, 
+    icon: <FaFrown size={28} className="text-red-400" />, 
+    sparkline: [5, 4, 6, 3, 5, 4, 2]
+  }
+];
+
 
   return (
     <div className="min-h-screen flex flex-col bg-[var(--background)] text-[var(--text)]">
@@ -154,7 +165,7 @@ export default function Home() {
         )}
       </section>
 
-      {/* История последних анализов */}
+      {/* история */}
       <section className="mt-20 px-6 lg:px-16">
         <h2 className="text-2xl font-bold mb-6 text-center">Последние анализы</h2>
 
@@ -196,7 +207,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Статистика */}
+      {/* статистика */}
       <section className="mt-20 px-6 lg:px-16 mb-32">
         <h2 className="text-2xl font-bold mb-8 text-center">Ключевые показатели анализа</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -219,7 +230,6 @@ export default function Home() {
 
               <p className="text-sm text-[var(--text)]/70 mb-2">{stat.label}</p>
 
-              {/* Мини-график */}
               <svg className="w-full h-6" viewBox="0 0 100 20" preserveAspectRatio="none">
                 {stat.sparkline.map((val, i) => (
                   i < stat.sparkline.length - 1 && (

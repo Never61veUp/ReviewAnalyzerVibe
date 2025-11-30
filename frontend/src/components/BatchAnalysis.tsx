@@ -17,34 +17,34 @@ export default function BatchAnalysis({ file, setFile }: Props) {
   const navigate = useNavigate();
 
   const handleAnalyze = async () => {
-  if (!file) return;
+    if (!file) return;
 
-  setIsUploading(true);
-  setUploadProgress(0);
-  setError(null);
+    setIsUploading(true);
+    setUploadProgress(0);
+    setError(null);
 
-  try {
-    const interval = setInterval(() => {
-      setUploadProgress((prev) => Math.min(prev + 10, 90));
-    }, 100);
+    try {
+      const interval = setInterval(() => {
+        setUploadProgress((prev) => Math.min(prev + 10, 90));
+      }, 100);
 
-    const result: FileUploadResponse = await uploadFile(file);
-    clearInterval(interval);
-    setUploadProgress(100);
+      const result: FileUploadResponse = await uploadFile(file);
+      clearInterval(interval);
+      setUploadProgress(100);
 
-    // ✅ Исправленная проверка
-    if (result.errorMessage) {
-      throw new Error(result.errorMessage || "Ошибка при анализе на сервере");
+      // ✅ Исправленная проверка
+      if (result.errorMessage) {
+        throw new Error(result.errorMessage || "Ошибка при анализе на сервере");
+      }
+
+      navigate("/analysis-result", { state: { data: result } });
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message || "Ошибка при анализе");
+    } finally {
+      setIsUploading(false);
     }
-
-    navigate("/analysis-result", { state: { data: result } });
-  } catch (err: any) {
-    console.error(err);
-    setError(err.message || "Ошибка при анализе");
-  } finally {
-    setIsUploading(false);
-  }
-};
+  };
 
 
   return (

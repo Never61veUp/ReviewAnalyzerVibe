@@ -41,11 +41,11 @@ export default function HowItWorks() {
 
       <div className="relative max-w-4xl mx-auto pl-12">
         <div
-    className="absolute left-5 top-0 bottom-0 w-1 rounded"
-    style={{
-      background: `linear-gradient(to bottom, var(--primary), var(--accent), var(--secondary))`,
-    }}
-  />
+          className="absolute left-5 top-0 bottom-0 w-1 rounded"
+          style={{
+            background: `linear-gradient(to bottom, var(--primary), var(--accent), var(--secondary))`,
+          }}
+        />
 
         {steps.map((step, index) => (
           <motion.div
@@ -57,8 +57,8 @@ export default function HowItWorks() {
             className="relative mb-12"
           >
             <div className="absolute left-0 top-0 w-12 h-12 rounded-full bg-[var(--primary)] text-white flex items-center justify-center shadow-lg z-10">
-      {step.icon}
-    </div>
+              {step.icon}
+            </div>
 
             <div className="pl-16 p-6 rounded-3xl backdrop-blur-xl bg-white/20 dark:bg-black/20 border border-white/20 dark:border-white/10 shadow-md hover:shadow-2xl transition-transform duration-300 hover:-translate-y-1">
               <h2 className="text-xl font-semibold mb-2">{step.title}</h2>
