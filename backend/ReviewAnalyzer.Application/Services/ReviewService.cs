@@ -74,10 +74,9 @@ public class ReviewService : IReviewService
     public async Task<Result<Dictionary<string, double>>> GetPositiveSrcPercentList(Guid groupId, CancellationToken cancellationToken) => 
         await _repository.GetPositiveSrcPercentList(groupId, cancellationToken);
 
-    public async Task<Result<Review>> ParseOneReview(string review, CancellationToken cancellationToken = default)
+    public async Task<Result<Review>> ParseOneReview(byte[] review, CancellationToken cancellationToken = default)
     {
-        var bytes = System.Text.Encoding.UTF8.GetBytes(review);
-        var csvResult = await _processReview.AnalyzeCsvAsync(bytes, "gg", cancellationToken);
+        var csvResult = await _processReview.AnalyzeCsvAsync(review, "gg", cancellationToken);
         var input = CsvParser.ParseCsv(csvResult.Value);
         if(input.Count == 0)
             return Result.Failure<Review>("ml service error");

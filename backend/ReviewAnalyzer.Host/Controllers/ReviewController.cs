@@ -1,4 +1,5 @@
-﻿using CSharpFunctionalExtensions;
+﻿using System.Text;
+using CSharpFunctionalExtensions;
 using Microsoft.AspNetCore.Mvc;
 using ReviewAnalyzer.Application.Services;
 using ReviewAnalyzer.Core.Model;
@@ -77,7 +78,15 @@ public class ReviewController : BaseController
     [HttpGet("review-one")]
     public async Task<IActionResult> ParseOneReview(string review, CancellationToken cancellationToken = default)
     {
-        var result = await _service.ParseOneReview(review, cancellationToken);
+        var id = Guid.NewGuid();
+        var src = "user_input";
+        
+        var safeText = review.Replace("\"", "\"\"");
+
+        var csv = $"id,text,src\r\n{id},\"{safeText}\",\"{src}\"";
+
+        var bytes =  Encoding.UTF8.GetBytes(csv);
+        var result = await _service.ParseOneReview(bytes, cancellationToken);
         return FromResult(result);
     }
 }
